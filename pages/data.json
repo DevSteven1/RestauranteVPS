@@ -1,12 +1,14 @@
 [
-    {"name": "Item 1"},
-    {"name": "Item 2"},
-    {"name": "Item 3"},
-    {"name": "Item 4"},
-    {"name": "Item 5"},
-    {"name": "Item 6"},
-    {"name": "Item 7"},
-    {"name": "Item 8"},
-    {"name": "Item 9"},
-    {"name": "Item 10"}
+    {"name": "Hamburgesa","price":10.000},
+    {"name": "Pizza","price":32.000},
+    {"name": "Perro","price":6.00},
+    {"name": "Hamburgesa","price":10.000},
+    {"name": "Pizza","price":32.000},
+    {"name": "Perro","price":6.00},
+    {"name": "Hamburgesa","price":10.000},
+    {"name": "Pizza","price":32.000},
+    {"name": "Perro","price":6.00},
+    {"name": "Hamburgesa","price":10.000},
+    {"name": "Pizza","price":32.000},
+    {"name": "Perro","price":6.00}
 ]

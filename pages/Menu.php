@@ -7,14 +7,14 @@ if (!isset($_SESSION['cart'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $itemToAdd = $_POST['item_name'];
-    if (!in_array($itemToAdd, $_SESSION['cart'])) {
-        $_SESSION['cart'][] = $itemToAdd;
-    }
+    $_SESSION['cart'][] = $itemToAdd;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order'])) {
-    $_SESSION['cart'] = [];
+    // Aquí puedes agregar el código para enviar los datos a la base de datos.
+    // Por ahora, solo muestra una alerta.
     echo "<script>alert('¡Tu pedido ha sido realizado con éxito!');</script>";
+    $_SESSION['cart'] = [];
 }
 
 // Handle remove item from cart
@@ -38,60 +38,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_item'])) {
         .cart-item {
             margin-bottom: 5px;
             padding: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid black;
             border-radius: 5px;
         }
 
         .cart-btn {
-            background-color: #ff4d4d;
+            background-color: black;
             color: white;
             border: none;
             padding: 6px 10px;
             border-radius: 4px;
             cursor: pointer;
         }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: white;
+        }
+
+        .swiper-pagination-bullet {
+            background-color: black; 
+        }
+
+        .swiper-pagination-bullet-active {
+            background-color: purple; 
+        }
     </style>
 </head>
 <body class="grid grid-cols-12 w-screen h-screen p-10">
-    <form method="post" class="col-span-2 p-1 grid grid-rows-12 border rounded-s-lg">
-        <div class="row-span-11 flex flex-col space-y-5 rounded-lg w-full p-1">
+    <form method="post" class="col-span-2 p-1 grid grid-rows-12 border border-black rounded-s-lg">
+        <div class=" row-span-12 flex flex-col space-y-5 rounded-lg p-1">
             <?php
+            $totalPrice = 0;
+            $jsonData = file_get_contents('data.json');
+            $items = json_decode($jsonData, true);
+
             foreach ($_SESSION['cart'] as $item) {
+                foreach ($items as $product) {
+                    if ($product['name'] === $item) {
+                        $price = $product['price'];
+                        $totalPrice += $price;
+                        break;
+                    }
+                }
                 echo ("
                     <div class='cart-item bg-white rounded flex items-center justify-between'>
-                        $item
+                        $item - $$price
                         <form method='post'>
                             <input type='hidden' name='item_name' value='$item'>
-                            <button type='submit' name='remove_item' class='bg-red-200'>borrar</button>
+                            <button type='submit' name='remove_item' class='bg-black text-md text-white border rounded-lg p-1'>BORRAR</button>
                         </form>
                     </div>
                 ");
             }
+            echo "<div class='text-center bg-white p-2 rounded mt-4'>Total: $$totalPrice</div>";
             ?>
+            <button type="submit" name="order" class="cart-btn">Ordenar</button>
         </div>
     </form>
-    <section class="col-span-10 p-4 rounded-e-lg border">
+    <section class="col-span-10 p-4 rounded-e-lg border border-black">
         <div class="swiper mySwiper w-full h-full">
             <div class="swiper-wrapper">
                 <?php
-                $jsonData = file_get_contents('data.json');
-                $items = json_decode($jsonData, true);
                 $itemsPerSlide = 6; // 3 items per row, 2 rows per slide
                 $totalItems = count($items);
                 $totalSlides = ceil($totalItems / $itemsPerSlide);
 
                 for ($slideIndex = 0; $slideIndex < $totalSlides; $slideIndex++) {
-                    echo "<div class='swiper-slide bg-pink-300 grid grid-cols-3 grid-rows-2 gap-4 p-4'>";
+                    echo "<div class='swiper-slide bg-black text-xl grid grid-cols-3 grid-rows-2 gap-4 p-4'>";
                     for ($itemIndex = 0; $itemIndex < $itemsPerSlide; $itemIndex++) {
                         $currentIndex = ($slideIndex * $itemsPerSlide) + $itemIndex;
                         if ($currentIndex < $totalItems) {
                             $itemName = $items[$currentIndex]['name'];
+                            $price = $items[$currentIndex]["price"];
                             echo "
                                 <div class='item flex flex-col items-center border p-2 bg-white rounded'>
-                                    <span>$itemName</span>
+                                    <p class='item-name'>$itemName</p>
+                                    <p class='item-price'>$$price</p>
                                     <form method='post'>
                                         <input type='hidden' name='item_name' value='$itemName'>
-                                        <button type='submit' name='add_to_cart' class='mt-2 p-2 bg-blue-500 text-white rounded'>Agregar</button>
+                                        <button type='submit' name='add_to_cart' class='cart-btn'>Añadir al carrito</button>
                                     </form>
                                 </div>
                             ";
@@ -101,30 +127,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_item'])) {
                 }
                 ?>
             </div>
+            <div class="swiper-pagination"></div>
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
-            <div class="swiper-pagination"></div>
         </div>
     </section>
-
-    <!-- Ordenar fuera de la rejilla -->
-    <div class="absolute z-10 bottom-4 right-4">
-        <form method="post">
-            <input type="submit" class="text-xl border rounded-lg h-[50px] w-[200px] bg-blue-500 text-white font-bold cart-btn" name="order" value="ORDENAR"></input>
-        </form>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        var swiper = new Swiper(".mySwiper", {
+        var swiper = new Swiper('.mySwiper', {
+            slidesPerView: 1,
+            spaceBetween: 10,
             pagination: {
-                el: ".swiper-pagination",
+                el: '.swiper-pagination',
+                clickable: true,
             },
             navigation: {
-                nextEl: ".swiper-button-next",
-                prevEl: ".swiper-button-prev",
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
             },
-            loop: true,
+            loop:true
         });
     </script>
 </body>
