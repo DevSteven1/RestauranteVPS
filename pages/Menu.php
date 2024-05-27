@@ -10,9 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $_SESSION['cart'][] = $itemToAdd;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order'])) {
-    // Aquí puedes agregar el código para enviar los datos a la base de datos.
-    // Por ahora, solo muestra una alerta.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order'])) {  
     echo "<script>alert('¡Tu pedido ha sido realizado con éxito!');</script>";
     $_SESSION['cart'] = [];
 }
@@ -69,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_item'])) {
         <div class=" row-span-12 flex flex-col space-y-5 rounded-lg p-1">
             <?php
             $totalPrice = 0;
-            $jsonData = file_get_contents('data.json');
+            $jsonData = file_get_contents('http://localhost/restaurante/assets/GetPlatillos.php');
             $items = json_decode($jsonData, true);
 
             foreach ($_SESSION['cart'] as $item) {
@@ -99,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_item'])) {
         <div class="swiper mySwiper w-full h-full">
             <div class="swiper-wrapper">
                 <?php
-                $itemsPerSlide = 6; // 3 items per row, 2 rows per slide
+                $itemsPerSlide = 6;
                 $totalItems = count($items);
                 $totalSlides = ceil($totalItems / $itemsPerSlide);
 
